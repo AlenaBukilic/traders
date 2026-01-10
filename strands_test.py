@@ -87,15 +87,18 @@ async def test_agent_invocation(agent):
         result = await agent.invoke_async("Say 'Hello from Strands!' and nothing else.")
         
         print(f"✓ Agent responded successfully")
-        # Check what's in result
-        if hasattr(result, 'messages') and result.messages:
-            last_msg = result.messages[-1]
-            if hasattr(last_msg, 'content'):
-                print(f"  Response: {last_msg.content}")
+        # Access the response correctly
+        if hasattr(result.message, 'content'):
+            if isinstance(result.message.content, list) and len(result.message.content) > 0:
+                content = result.message.content[0]
+                if hasattr(content, 'text'):
+                    print(f"  Response: {content.text}")
+                else:
+                    print(f"  Response: {content}")
             else:
-                print(f"  Response: {last_msg}")
+                print(f"  Response: {result.message.content}")
         else:
-            print(f"  Response: {result}")
+            print(f"  Response: {result.message}")
         return True
     except Exception as e:
         print(f"✗ Failed to invoke agent: {e}")
