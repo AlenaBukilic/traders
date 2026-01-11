@@ -24,7 +24,7 @@ async def test_strands_researcher_creation():
     print("\n=== Test 1: Strands Researcher Creation ===")
     
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         print(f"✓ Created Strands researcher: {researcher.name}")
@@ -78,7 +78,7 @@ async def test_strands_researcher_invocation():
     print("\n=== Test 3: Strands Researcher Invocation ===")
     
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         
@@ -158,7 +158,7 @@ async def test_mcp_tool_availability():
     print("\n=== Test 5: MCP Tool Availability ===")
     
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         

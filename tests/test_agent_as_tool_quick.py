@@ -16,7 +16,7 @@ async def test_quick():
     
     print("\nTest 1: Create Researcher Tool")
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
@@ -31,7 +31,7 @@ async def test_quick():
         
         print("\nTest 2: Use Tool in Agent")
         from strands import Agent
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         
         model = ModelProvider.get_strands_model("gpt-4o-mini")
         agent = Agent(

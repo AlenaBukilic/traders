@@ -18,7 +18,7 @@ async def test_multi_trader_creation():
     print("=" * 60)
     
     try:
-        from strands_trading_floor import create_strands_traders
+        from agents.trading_floor import create_strands_traders
         
         print("\n1. Creating multiple traders...")
         traders = create_strands_traders()
@@ -55,7 +55,7 @@ async def test_multi_trader_creation():
         
         print("\n4. Testing concurrent operations...")
         # Test that we can create all researcher tools concurrently
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         print("  Creating researcher tools concurrently...")
         researcher_tools = await asyncio.gather(*[
@@ -86,7 +86,7 @@ async def test_concurrent_safety():
     print("=" * 60)
     
     try:
-        from strands_traders import StrandsTrader
+        from agents.trader import StrandsTrader
         
         print("\n1. Creating 2 traders with same model...")
         trader1 = StrandsTrader("Warren", "Patience", "gpt-4o-mini")

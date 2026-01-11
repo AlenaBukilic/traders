@@ -1,10 +1,9 @@
 import mcp
 from mcp.client.stdio import stdio_client
 from mcp import StdioServerParameters
-from agents import FunctionTool
 import json
 
-params = StdioServerParameters(command="uv", args=["run", "accounts_server.py"], env=None)
+params = StdioServerParameters(command="uv", args=["run", "python", "-m", "infrastructure.accounts_server"], env=None)
 
 
 async def list_accounts_tools():
@@ -36,6 +35,13 @@ async def read_strategy_resource(name):
             return result.contents[0].text
 
 async def get_accounts_tools_openai():
+    """
+    Get accounts tools in OpenAI Agents SDK format.
+    Used by legacy implementation only.
+    """
+    # Import here to avoid circular import with our local agents/ directory
+    from agents import FunctionTool  # This is the OpenAI SDK agents package
+    
     openai_tools = []
     for tool in await list_accounts_tools():
         schema = {**tool.inputSchema, "additionalProperties": False}

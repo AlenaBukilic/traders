@@ -20,7 +20,7 @@ async def test_strands_model_creation():
     """Test 1: Create Strands models for different providers"""
     print("\n=== Test 1: Strands Model Creation ===")
     
-    from model_providers import ModelProvider
+    from core.model_providers import ModelProvider
     
     # Models to test (based on what's configured in traders.py)
     test_cases = [
@@ -47,7 +47,7 @@ async def test_openai_agents_model_creation():
     """Test 2: Create OpenAI Agents SDK models for different providers"""
     print("\n=== Test 2: OpenAI Agents Model Creation ===")
     
-    from model_providers import ModelProvider
+    from core.model_providers import ModelProvider
     
     test_cases = [
         ("gpt-4o-mini", "OpenAI"),
@@ -74,7 +74,7 @@ async def test_strands_agent_with_model():
     print("\n=== Test 3: Strands Agent with Model Provider ===")
     
     try:
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         from strands import Agent
         
         # Test with gpt-4o-mini since we know OpenAI key is available
@@ -109,7 +109,7 @@ async def test_openai_agents_agent_with_model():
     print("\n=== Test 4: OpenAI Agents Agent with Model Provider ===")
     
     try:
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         from agents import Agent
         
         # Test with gpt-4o-mini
@@ -136,7 +136,7 @@ async def test_model_switching():
     """Test 5: Test switching between different model providers"""
     print("\n=== Test 5: Model Switching ===")
     
-    from model_providers import ModelProvider
+    from core.model_providers import ModelProvider
     
     # Test creating multiple different models in sequence
     model_sequence = [
@@ -162,7 +162,7 @@ async def test_litellm_availability():
     print("\n=== Test 6: LiteLLM Availability (Optional) ===")
     
     try:
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         model = ModelProvider.get_strands_model_with_litellm("gpt-4o-mini")
         print("✓ LiteLLM is available and working")
         return True

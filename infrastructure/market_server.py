@@ -1,5 +1,10 @@
 from mcp.server.fastmcp import FastMCP
-from market import get_share_price
+
+# Support both module import and direct script execution
+try:
+    from .market import get_share_price
+except ImportError:
+    from market import get_share_price
 
 mcp = FastMCP("market_server")
 

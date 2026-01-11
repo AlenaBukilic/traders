@@ -18,7 +18,7 @@ async def test_trader_creation():
     print("=" * 60)
     
     try:
-        from strands_traders import StrandsTrader
+        from agents.trader import StrandsTrader
         
         print("\n1. Creating StrandsTrader instance...")
         trader = StrandsTrader("Warren", "Patience", "gpt-4o-mini")
@@ -35,7 +35,7 @@ async def test_trader_creation():
         print(f"  Preview: {account[:100]}...")
         
         print("\n3. Creating researcher tool...")
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         researcher_tool = await get_strands_researcher_tool(trader.name, trader.model_name)
         print(f"✓ Researcher tool created")
         

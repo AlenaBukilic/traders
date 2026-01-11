@@ -1,7 +1,7 @@
 """
-Strands Trading Floor - Multi-Agent Orchestration
+Trading Floor - Multi-Agent Orchestration
 
-This module manages multiple concurrent Strands Trader agents, creating
+This module manages multiple concurrent Trader agents, creating
 a simulated trading floor where multiple traders with different strategies
 operate simultaneously.
 
@@ -13,10 +13,10 @@ Key Features:
 - Graceful error handling per trader
 """
 
-from strands_traders import StrandsTrader
+from agents.trader import Trader
 from typing import List
 import asyncio
-from market import is_market_open
+from infrastructure.market import is_market_open
 from dotenv import load_dotenv
 import os
 
@@ -46,16 +46,16 @@ else:
     short_model_names = ["GPT 4o mini"] * 4
 
 
-def create_strands_traders() -> List[StrandsTrader]:
+def create_traders() -> List[Trader]:
     """
-    Create a list of Strands traders with different strategies and models.
+    Create a list of traders with different strategies and models.
     
     Returns:
-        List of StrandsTrader instances ready to execute
+        List of Trader instances ready to execute
     """
     traders = []
     for name, lastname, model_name in zip(names, lastnames, model_names):
-        traders.append(StrandsTrader(name, lastname, model_name))
+        traders.append(Trader(name, lastname, model_name))
     return traders
 
 
@@ -69,13 +69,8 @@ async def run_every_n_minutes():
     3. Checks market hours (optional)
     4. Handles errors gracefully
     5. Continues indefinitely until interrupted
-    
-    Note: Observability/tracing will be added in Phase 6
     """
-    # Note: LogTracer integration will be added in Phase 6
-    # For now, traders handle their own logging via write_log()
-    
-    traders = create_strands_traders()
+    traders = create_traders()
     
     print(f"Created {len(traders)} traders:")
     for trader in traders:
@@ -118,7 +113,7 @@ async def run_once():
     This function runs all traders once and exits, making it ideal
     for validation and testing without waiting for the scheduler.
     """
-    traders = create_strands_traders()
+    traders = create_traders()
     
     print(f"\n{'='*60}")
     print(f"Single Cycle Test - Running {len(traders)} traders")
@@ -173,7 +168,7 @@ if __name__ == "__main__":
             sys.exit(1)
     else:
         # Normal mode: run continuously
-        print(f"Starting Strands trading floor")
+        print(f"Starting trading floor")
         print(f"Running every {RUN_EVERY_N_MINUTES} minutes")
         print(f"Market hours check: {'disabled' if RUN_EVEN_WHEN_MARKET_IS_CLOSED else 'enabled'}")
         print(f"Multi-model mode: {'enabled' if USE_MANY_MODELS else 'disabled'}")

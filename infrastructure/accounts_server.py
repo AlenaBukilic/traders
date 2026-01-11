@@ -1,5 +1,10 @@
 from mcp.server.fastmcp import FastMCP
-from accounts import Account
+
+# Support both module import and direct script execution
+try:
+    from .accounts import Account
+except ImportError:
+    from accounts import Account
 
 mcp = FastMCP("accounts_server")
 

@@ -1,5 +1,5 @@
 """
-Strands Researcher Agent Implementation
+Researcher Agent Implementation
 
 This module provides the Researcher agent using the Strands Agents SDK.
 The Researcher agent is responsible for searching the web for financial news,
@@ -18,13 +18,13 @@ from typing import Optional
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from strands import Agent
 from strands.tools.mcp import MCPClient
-from model_providers import ModelProvider
-from templates import researcher_instructions, research_tool
-from mcp_params import researcher_mcp_server_params
-from strands_observability import create_log_hook
+from core.model_providers import ModelProvider
+from core.templates import researcher_instructions, research_tool
+from infrastructure.mcp_params import researcher_mcp_server_params
+from core.observability import create_log_hook
 
 
-async def get_strands_researcher(trader_name: str, model_name: str = "gpt-4o-mini") -> Agent:
+async def get_researcher(trader_name: str, model_name: str = "gpt-4o-mini") -> Agent:
     """
     Create a Researcher agent using Strands SDK.
     
@@ -41,7 +41,7 @@ async def get_strands_researcher(trader_name: str, model_name: str = "gpt-4o-min
         Strands Agent configured as a Researcher
         
     Note:
-        The MCP servers must be configured in mcp_params.py
+        The MCP servers must be configured in infrastructure/mcp_params.py
         The agent uses system_prompt (not instructions) in Strands API
     """
     
@@ -92,7 +92,7 @@ async def get_strands_researcher(trader_name: str, model_name: str = "gpt-4o-min
     return researcher
 
 
-async def get_strands_researcher_tool(trader_name: str, model_name: str = "gpt-4o-mini"):
+async def get_researcher_tool(trader_name: str, model_name: str = "gpt-4o-mini"):
     """
     Create a Researcher agent and convert it to a tool for use by Trader.
     
@@ -112,14 +112,14 @@ async def get_strands_researcher_tool(trader_name: str, model_name: str = "gpt-4
         Tool-wrapped Researcher agent that can be called by other agents
         
     Example:
-        researcher_tool = await get_strands_researcher_tool("Warren")
+        researcher_tool = await get_researcher_tool("Warren")
         trader = Agent(tools=[researcher_tool], ...)
         # Trader can now call the researcher tool
     """
     from strands import tool
     
     # Create the researcher agent
-    researcher = await get_strands_researcher(trader_name, model_name)
+    researcher = await get_researcher(trader_name, model_name)
     
     # Wrap the researcher invocation in a tool
     # We'll use a closure to capture the researcher instance
@@ -178,13 +178,13 @@ async def test_researcher_standalone(trader_name: str = "Warren", model_name: st
         trader_name: Name of trader (for memory isolation)
         model_name: Model to use
     """
-    print(f"\n=== Testing Strands Researcher ===")
+    print(f"\n=== Testing Researcher ===")
     print(f"Trader: {trader_name}")
     print(f"Model: {model_name}\n")
     
     # Create researcher
     print("Creating researcher agent...")
-    researcher = await get_strands_researcher(trader_name, model_name)
+    researcher = await get_researcher(trader_name, model_name)
     print(f"✓ Created researcher: {researcher.name}")
     
     # Test with a simple query

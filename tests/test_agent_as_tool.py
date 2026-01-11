@@ -24,7 +24,7 @@ async def test_researcher_tool_creation():
     print("\n=== Test 1: Researcher Tool Creation ===")
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
@@ -50,7 +50,7 @@ async def test_tool_direct_invocation():
     print("\n=== Test 2: Direct Tool Invocation ===")
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
@@ -78,9 +78,9 @@ async def test_tool_with_agent():
     print("\n=== Test 3: Tool Used by Another Agent ===")
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         from strands import Agent
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         
         # Create researcher tool
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")

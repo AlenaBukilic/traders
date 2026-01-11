@@ -20,7 +20,7 @@ async def test_both_researchers_creation():
     # Test Strands
     print("1. Strands Researcher:")
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         print(f"   ✓ Created: {researcher.name}")
         # Skip cleanup - it's not implemented in Strands Agent
