@@ -21,6 +21,7 @@ from strands.tools.mcp import MCPClient
 from model_providers import ModelProvider
 from templates import researcher_instructions, research_tool
 from mcp_params import researcher_mcp_server_params
+from strands_observability import create_log_hook
 
 
 async def get_strands_researcher(trader_name: str, model_name: str = "gpt-4o-mini") -> Agent:
@@ -75,13 +76,17 @@ async def get_strands_researcher(trader_name: str, model_name: str = "gpt-4o-min
     # Get model from provider
     model = ModelProvider.get_strands_model(model_name)
     
+    # Create log hook for observability
+    log_hook = create_log_hook(trader_name)
+    
     # Create Strands Agent
     # Note: Strands uses system_prompt instead of instructions
     researcher = Agent(
         name="Researcher",
         system_prompt=researcher_instructions(),
         model=model,
-        tools=mcp_tools  # MCP clients are passed as tools
+        tools=mcp_tools,  # MCP clients are passed as tools
+        hooks=[log_hook]  # Add logging hook
     )
     
     return researcher

@@ -30,6 +30,7 @@ from mcp_params import trader_mcp_server_params
 from strands_researcher import get_strands_researcher_tool
 from accounts_client import read_accounts_resource, read_strategy_resource
 from database import write_log
+from strands_observability import create_log_hook
 
 
 # Max turns for agent execution (from original)
@@ -73,29 +74,21 @@ class StrandsTrader:
         # Get model from provider
         model = ModelProvider.get_strands_model(self.model_name)
         
+        # Create log hook for observability
+        log_hook = create_log_hook(self.name)
+        
+        # Combine all tools
+        all_tools = [researcher_tool] + (trader_mcp_servers if trader_mcp_servers else [])
+        
         # Create Strands Agent
         # Note: Strands uses system_prompt (not instructions)
         self.agent = Agent(
             name=self.name,
             system_prompt=trader_instructions(self.name),
             model=model,
-            tools=[researcher_tool],  # Researcher as first tool
-            # MCP servers will be added via the tools parameter
-            # We need to include them in the tools list
+            tools=all_tools,
+            hooks=[log_hook]  # Add logging hook
         )
-        
-        # Add MCP tools to the agent
-        # In Strands, MCP clients are tool providers
-        # They need to be in the tools list
-        if trader_mcp_servers:
-            # We need to recreate the agent with all tools
-            all_tools = [researcher_tool] + trader_mcp_servers
-            self.agent = Agent(
-                name=self.name,
-                system_prompt=trader_instructions(self.name),
-                model=model,
-                tools=all_tools
-            )
         
         return self.agent
     
