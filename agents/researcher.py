@@ -80,7 +80,6 @@ async def get_researcher(trader_name: str, model_name: str = "gpt-4o-mini") -> A
     log_hook = create_log_hook(trader_name)
     
     # Create Strands Agent
-    # Note: Strands uses system_prompt instead of instructions
     researcher = Agent(
         name="Researcher",
         system_prompt=researcher_instructions(),
@@ -196,8 +195,6 @@ async def test_researcher_standalone(trader_name: str = "Warren", model_name: st
         print(f"✓ Researcher responded successfully")
         print(f"\nStop reason: {result.stop_reason}")
         
-        # Try to extract response
-        # Note: Response structure may be complex, handle gracefully
         if hasattr(result, 'message'):
             print(f"\nResponse preview: {str(result.message)[:500]}...")
         

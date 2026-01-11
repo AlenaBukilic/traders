@@ -81,7 +81,6 @@ class Trader:
         all_tools = [researcher_tool] + (trader_mcp_servers if trader_mcp_servers else [])
         
         # Create Strands Agent
-        # Note: Strands uses system_prompt (not instructions)
         self.agent = Agent(
             name=self.name,
             system_prompt=trader_instructions(self.name),
@@ -127,8 +126,6 @@ class Trader:
         )
         
         # Invoke agent using Strands API
-        # Note: Strands uses invoke_async instead of Runner.run
-        # TODO: Figure out how to handle max_turns in Strands
         result = await self.agent.invoke_async(message)
         
         # Log completion
