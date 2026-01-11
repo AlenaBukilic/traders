@@ -24,7 +24,7 @@ async def test_researcher_tool_creation():
     print("\n=== Test 1: Researcher Tool Creation ===")
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
@@ -32,7 +32,6 @@ async def test_researcher_tool_creation():
         print(f"  Type: {type(researcher_tool)}")
         print(f"  Name: {researcher_tool.name if hasattr(researcher_tool, 'name') else 'N/A'}")
         
-        # Check if it has a description
         if hasattr(researcher_tool, 'description'):
             desc_preview = researcher_tool.description[:100] if researcher_tool.description else "N/A"
             print(f"  Description: {desc_preview}...")
@@ -50,11 +49,10 @@ async def test_tool_direct_invocation():
     print("\n=== Test 2: Direct Tool Invocation ===")
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
-        # Invoke the tool directly as a function
         query = "What is Tesla's current stock price? Be very brief."
         print(f"Query: {query}")
         print("Invoking tool... (may take 30-60 seconds)")
@@ -78,14 +76,12 @@ async def test_tool_with_agent():
     print("\n=== Test 3: Tool Used by Another Agent ===")
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         from strands import Agent
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         
-        # Create researcher tool
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
-        # Create a test agent that uses the researcher tool
         model = ModelProvider.get_strands_model("gpt-4o-mini")
         test_agent = Agent(
             name="TestAgent",
@@ -96,7 +92,6 @@ async def test_tool_with_agent():
         
         print(f"✓ Created test agent with researcher tool")
         
-        # Ask the test agent a question that requires using the researcher
         query = "Use the researcher to find out: What is happening with Tesla stock today? Give a brief summary."
         print(f"\nQuery to agent: {query}")
         print("Invoking agent... (may take 60-90 seconds)")
@@ -106,7 +101,6 @@ async def test_tool_with_agent():
         print(f"✓ Agent responded successfully")
         print(f"  Stop reason: {result.stop_reason}")
         
-        # Try to extract response
         if hasattr(result, 'message'):
             msg = result.message
             if isinstance(msg, dict) and 'content' in msg:
@@ -135,7 +129,6 @@ async def test_compare_with_openai_agents():
         from mcp_params import researcher_mcp_server_params
         from contextlib import AsyncExitStack
         
-        # Create OpenAI Agents researcher tool
         async with AsyncExitStack() as stack:
             mcp_servers = [
                 await stack.enter_async_context(
@@ -166,7 +159,6 @@ async def main():
     
     results = []
     
-    # Test 1: Tool creation
     success, researcher_tool = await test_researcher_tool_creation()
     results.append(success)
     
@@ -174,17 +166,13 @@ async def main():
         print("\n⚠ Cannot proceed without tool creation working")
         return False
     
-    # Test 2: Direct invocation
     print("\n⚠ Note: The next tests involve actual API calls and may take 1-2 minutes")
     results.append(await test_tool_direct_invocation())
     
-    # Test 3: Tool with agent (the critical test!)
     results.append(await test_tool_with_agent())
     
-    # Test 4: Compare with OpenAI Agents
     results.append(await test_compare_with_openai_agents())
     
-    # Summary
     print("\n" + "=" * 60)
     print("Validation Summary")
     print("=" * 60)
@@ -198,16 +186,14 @@ async def main():
     
     for i, (name, result) in enumerate(zip(test_names, results), 1):
         status = "✓ PASS" if result else "✗ FAIL"
-        importance = " 🔥" if i == 3 else ""  # Mark the critical test
+        importance = " 🔥" if i == 3 else ""
         print(f"Test {i}: {name:<35} {status}{importance}")
     
     passed = sum(results)
     total = len(results)
     print(f"\nTotal: {passed}/{total} tests passed")
     
-    # Determine overall success
-    # Test 3 (tool used by agent) is the critical one
-    if results[2]:  # Index 2 is test 3
+    if results[2]:
         print("\n✅ Phase 3 validation SUCCESSFUL!")
         print("Agent-as-Tool pattern works correctly!")
         print("Ready to proceed to Phase 4 (Trader Agent Migration)")

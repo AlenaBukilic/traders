@@ -1,5 +1,5 @@
 """
-Strands Observability Adapter
+Observability and Logging
 
 This module provides logging and observability for Strands agents,
 similar to the original LogTracer but adapted for Strands' hooks system.
@@ -20,8 +20,10 @@ from strands.hooks import (
     BeforeModelCallEvent,
     AfterModelCallEvent,
 )
-from database import write_log
+from infrastructure.database import write_log
 from typing import Optional
+import secrets
+import string
 
 
 class StrandsLogHook(HookProvider):
@@ -119,9 +121,6 @@ def create_log_hook(trader_name: str) -> StrandsLogHook:
 
 
 # For backward compatibility with trace_id pattern
-import secrets
-import string
-
 ALPHANUM = string.ascii_lowercase + string.digits
 
 
@@ -145,21 +144,19 @@ def make_trace_id(tag: str) -> str:
     return f"trace_{tag}{random_suffix}"
 
 
-# Example usage
+
 if __name__ == "__main__":
     import asyncio
     from strands import Agent
-    from model_providers import ModelProvider
+    from core.model_providers import ModelProvider
     
     async def test_hook():
         """Test the log hook"""
         print("Testing StrandsLogHook")
         
-        # Create hook
         hook = create_log_hook("TestTrader")
         print(f"✓ Created hook for TestTrader")
         
-        # Create agent with hook
         model = ModelProvider.get_strands_model("gpt-4o-mini")
         agent = Agent(
             name="TestAgent",
@@ -170,15 +167,13 @@ if __name__ == "__main__":
         
         print(f"✓ Created agent with hook")
         
-        # Invoke agent to trigger hooks
         print("\nInvoking agent (will trigger hooks)...")
         result = await agent.invoke_async("Say 'Hook test successful'")
         
         print(f"\n✓ Agent invoked, hooks triggered")
         print(f"  Stop reason: {result.stop_reason}")
         
-        # Check logs
-        from database import read_log
+        from infrastructure.database import read_log
         logs = list(read_log("TestTrader", last_n=10))
         
         print(f"\nLogs written ({len(logs)} entries):")

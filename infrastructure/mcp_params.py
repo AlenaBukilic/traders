@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from market import is_paid_polygon, is_realtime_polygon
+from .market import is_paid_polygon, is_realtime_polygon
 
 load_dotenv(override=True)
 
@@ -16,14 +16,14 @@ if is_paid_polygon or is_realtime_polygon:
         "env": {"POLYGON_API_KEY": polygon_api_key},
     }
 else:
-    market_mcp = {"command": "uv", "args": ["run", "market_server.py"]}
+    market_mcp = {"command": "uv", "args": ["run", "python", "-m", "infrastructure.market_server"]}
 
 
 # The full set of MCP servers for the trader: Accounts, Push Notification and the Market
 
 trader_mcp_server_params = [
-    {"command": "uv", "args": ["run", "accounts_server.py"]},
-    {"command": "uv", "args": ["run", "push_server.py"]},
+    {"command": "uv", "args": ["run", "python", "-m", "infrastructure.accounts_server"]},
+    {"command": "uv", "args": ["run", "python", "-m", "infrastructure.push_server"]},
     market_mcp,
 ]
 

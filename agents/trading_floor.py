@@ -1,7 +1,7 @@
 """
-Strands Trading Floor - Multi-Agent Orchestration
+Trading Floor - Multi-Agent Orchestration
 
-This module manages multiple concurrent Strands Trader agents, creating
+This module manages multiple concurrent Trader agents, creating
 a simulated trading floor where multiple traders with different strategies
 operate simultaneously.
 
@@ -13,23 +13,21 @@ Key Features:
 - Graceful error handling per trader
 """
 
-from strands_traders import StrandsTrader
+from agents.trader import Trader
 from typing import List
 import asyncio
-from market import is_market_open
+from infrastructure.market import is_market_open
 from dotenv import load_dotenv
 import os
 
 load_dotenv(override=True)
 
-# Configuration from environment
 RUN_EVERY_N_MINUTES = int(os.getenv("RUN_EVERY_N_MINUTES", "60"))
 RUN_EVEN_WHEN_MARKET_IS_CLOSED = (
     os.getenv("RUN_EVEN_WHEN_MARKET_IS_CLOSED", "false").strip().lower() == "true"
 )
 USE_MANY_MODELS = os.getenv("USE_MANY_MODELS", "false").strip().lower() == "true"
 
-# Trader configurations
 names = ["Warren", "George", "Ray", "Cathie"]
 lastnames = ["Patience", "Bold", "Systematic", "Crypto"]
 
@@ -46,16 +44,16 @@ else:
     short_model_names = ["GPT 4o mini"] * 4
 
 
-def create_strands_traders() -> List[StrandsTrader]:
+def create_traders() -> List[Trader]:
     """
-    Create a list of Strands traders with different strategies and models.
+    Create a list of traders with different strategies and models.
     
     Returns:
-        List of StrandsTrader instances ready to execute
+        List of Trader instances ready to execute
     """
     traders = []
     for name, lastname, model_name in zip(names, lastnames, model_names):
-        traders.append(StrandsTrader(name, lastname, model_name))
+        traders.append(Trader(name, lastname, model_name))
     return traders
 
 
@@ -69,13 +67,8 @@ async def run_every_n_minutes():
     3. Checks market hours (optional)
     4. Handles errors gracefully
     5. Continues indefinitely until interrupted
-    
-    Note: Observability/tracing will be added in Phase 6
     """
-    # Note: LogTracer integration will be added in Phase 6
-    # For now, traders handle their own logging via write_log()
-    
-    traders = create_strands_traders()
+    traders = create_traders()
     
     print(f"Created {len(traders)} traders:")
     for trader in traders:
@@ -87,14 +80,11 @@ async def run_every_n_minutes():
             print(f"Running trading cycle at {asyncio.get_event_loop().time()}")
             print(f"{'='*60}\n")
             
-            # Run all traders concurrently
-            # asyncio.gather runs them in parallel and waits for all to complete
             results = await asyncio.gather(
                 *[trader.run() for trader in traders],
-                return_exceptions=True  # Don't let one trader's error stop others
+                return_exceptions=True
             )
             
-            # Check results
             for trader, result in zip(traders, results):
                 if isinstance(result, Exception):
                     print(f"⚠ {trader.name} encountered error: {result}")
@@ -118,7 +108,7 @@ async def run_once():
     This function runs all traders once and exits, making it ideal
     for validation and testing without waiting for the scheduler.
     """
-    traders = create_strands_traders()
+    traders = create_traders()
     
     print(f"\n{'='*60}")
     print(f"Single Cycle Test - Running {len(traders)} traders")
@@ -128,13 +118,11 @@ async def run_once():
         print(f"  - {trader.name} ({trader.lastname}) using {trader.model_name}")
     print()
     
-    # Run all traders concurrently
     results = await asyncio.gather(
         *[trader.run() for trader in traders],
         return_exceptions=True
     )
     
-    # Report results
     print(f"\n{'='*60}")
     print("Results:")
     print(f"{'='*60}")
@@ -153,11 +141,9 @@ async def run_once():
     return success_count == len(traders)
 
 
-# Main entry point
 if __name__ == "__main__":
     import sys
     
-    # Check if running in test mode
     if len(sys.argv) > 1 and sys.argv[1] == "once":
         print("Running in single-cycle test mode")
         try:
@@ -172,8 +158,7 @@ if __name__ == "__main__":
             traceback.print_exc()
             sys.exit(1)
     else:
-        # Normal mode: run continuously
-        print(f"Starting Strands trading floor")
+        print(f"Starting trading floor")
         print(f"Running every {RUN_EVERY_N_MINUTES} minutes")
         print(f"Market hours check: {'disabled' if RUN_EVEN_WHEN_MARKET_IS_CLOSED else 'enabled'}")
         print(f"Multi-model mode: {'enabled' if USE_MANY_MODELS else 'disabled'}")

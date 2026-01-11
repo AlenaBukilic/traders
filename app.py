@@ -1,10 +1,20 @@
 import gradio as gr
 from util import css, js, Color
 import pandas as pd
-from trading_floor import names, lastnames, short_model_names
+import os
+from dotenv import load_dotenv
 import plotly.express as px
-from accounts import Account
-from database import read_log
+from infrastructure.accounts import Account
+from infrastructure.database import read_log
+
+load_dotenv(override=True)
+
+USE_LEGACY = os.getenv("USE_LEGACY_AGENTS", "false").strip().lower() == "true"
+
+if USE_LEGACY:
+    from legacy.trading_floor import names, lastnames, short_model_names
+else:
+    from agents.trading_floor import names, lastnames, short_model_names
 
 mapper = {
     "trace": Color.WHITE,
@@ -165,7 +175,6 @@ class TraderView:
         )
 
 
-# Main UI construction
 def create_ui():
     """Create the main Gradio UI for the trading simulation"""
 

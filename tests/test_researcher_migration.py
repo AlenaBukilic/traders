@@ -24,7 +24,7 @@ async def test_strands_researcher_creation():
     print("\n=== Test 1: Strands Researcher Creation ===")
     
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         print(f"✓ Created Strands researcher: {researcher.name}")
@@ -78,7 +78,7 @@ async def test_strands_researcher_invocation():
     print("\n=== Test 3: Strands Researcher Invocation ===")
     
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         
@@ -158,7 +158,7 @@ async def test_mcp_tool_availability():
     print("\n=== Test 5: MCP Tool Availability ===")
     
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         
@@ -185,23 +185,17 @@ async def main():
     
     results = []
     
-    # Test 1: Strands researcher creation
     results.append(await test_strands_researcher_creation())
     
-    # Test 2: OpenAI Agents researcher creation
     results.append(await test_openai_agents_researcher_creation())
     
-    # Test 3: Strands researcher invocation (may take time)
     print("\n⚠ Note: Invocation tests may take 30-60 seconds each")
     results.append(await test_strands_researcher_invocation())
     
-    # Test 4: OpenAI Agents researcher invocation (may take time)
     results.append(await test_openai_agents_researcher_invocation())
     
-    # Test 5: MCP tool availability
     results.append(await test_mcp_tool_availability())
     
-    # Summary
     print("\n" + "=" * 60)
     print("Validation Summary")
     print("=" * 60)
@@ -222,7 +216,6 @@ async def main():
     total = len(results)
     print(f"\nTotal: {passed}/{total} tests passed")
     
-    # Determine overall success
     if all(results):
         print("\n✅ Phase 2 validation SUCCESSFUL!")
         print("Researcher agent migration complete!")

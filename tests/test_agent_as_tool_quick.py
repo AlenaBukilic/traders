@@ -16,7 +16,7 @@ async def test_quick():
     
     print("\nTest 1: Create Researcher Tool")
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
         
@@ -25,13 +25,12 @@ async def test_quick():
         print(f"  Name: {getattr(researcher_tool, 'name', 'N/A')}")
         print(f"  Description: {getattr(researcher_tool, 'description', 'N/A')[:100]}...")
         
-        # Check it's callable
         if callable(researcher_tool):
             print(f"  ✓ Tool is callable")
         
         print("\nTest 2: Use Tool in Agent")
         from strands import Agent
-        from model_providers import ModelProvider
+        from core.model_providers import ModelProvider
         
         model = ModelProvider.get_strands_model("gpt-4o-mini")
         agent = Agent(

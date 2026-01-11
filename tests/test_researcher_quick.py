@@ -17,19 +17,16 @@ async def test_both_researchers_creation():
     
     results = []
     
-    # Test Strands
     print("1. Strands Researcher:")
     try:
-        from strands_researcher import get_strands_researcher
+        from agents.researcher import get_strands_researcher
         researcher = await get_strands_researcher("TestTrader", "gpt-4o-mini")
         print(f"   ✓ Created: {researcher.name}")
-        # Skip cleanup - it's not implemented in Strands Agent
         results.append(True)
     except Exception as e:
         print(f"   ✗ Failed: {e}")
         results.append(False)
     
-    # Test OpenAI Agents
     print("\n2. OpenAI Agents Researcher:")
     try:
         from traders import get_researcher

@@ -16,7 +16,7 @@ async def main():
     print("=" * 60)
     
     try:
-        from strands_researcher import get_strands_researcher_tool
+        from agents.researcher import get_strands_researcher_tool
         
         print("\n1. Creating researcher tool...")
         researcher_tool = await get_strands_researcher_tool("TestTrader", "gpt-4o-mini")
