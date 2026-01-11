@@ -91,25 +91,75 @@ async def get_strands_researcher_tool(trader_name: str, model_name: str = "gpt-4
     """
     Create a Researcher agent and convert it to a tool for use by Trader.
     
-    This is equivalent to the OpenAI Agents pattern of agent.as_tool().
-    In Strands, we'll need to wrap the agent invocation as a tool.
+    This implements the agent-as-tool pattern for Strands, equivalent to
+    OpenAI Agents' agent.as_tool() method.
+    
+    The pattern:
+    1. Create the researcher agent
+    2. Wrap its invoke_async method in a @tool decorated function
+    3. Return the tool for use by other agents
     
     Args:
-        trader_name: Name of the trader
+        trader_name: Name of the trader (for memory isolation)
         model_name: Model to use
     
     Returns:
-        Tool-wrapped Researcher agent
+        Tool-wrapped Researcher agent that can be called by other agents
         
-    Note:
-        This will be implemented in Phase 3 (Nested Agent Pattern).
-        For now, just return the agent for testing.
+    Example:
+        researcher_tool = await get_strands_researcher_tool("Warren")
+        trader = Agent(tools=[researcher_tool], ...)
+        # Trader can now call the researcher tool
     """
+    from strands import tool
+    
+    # Create the researcher agent
     researcher = await get_strands_researcher(trader_name, model_name)
     
-    # TODO: Phase 3 - Convert to tool using Strands pattern
-    # For now, return the agent itself for testing
-    return researcher
+    # Wrap the researcher invocation in a tool
+    # We'll use a closure to capture the researcher instance
+    @tool(
+        name="Researcher",
+        description=research_tool()
+    )
+    async def researcher_tool(query: str) -> str:
+        """
+        Research tool that delegates to the Researcher agent.
+        
+        Use this tool to research online for news and opportunities,
+        either based on your specific request to look into a certain stock,
+        or generally for notable financial news and opportunities.
+        
+        Args:
+            query: What kind of research you're looking for. Describe the research request clearly.
+        
+        Returns:
+            Research findings and analysis
+        """
+        # Invoke the researcher agent
+        result = await researcher.invoke_async(query)
+        
+        # Extract the response text from the result
+        # The response structure is: result.message (dict) with 'content' (list)
+        try:
+            if hasattr(result, 'message'):
+                msg = result.message
+                if isinstance(msg, dict) and 'content' in msg:
+                    content = msg['content']
+                    if isinstance(content, list) and len(content) > 0:
+                        # Extract text from first content block
+                        first_content = content[0]
+                        if isinstance(first_content, dict) and 'text' in first_content:
+                            return first_content['text']
+                        elif hasattr(first_content, 'text'):
+                            return first_content.text
+            
+            # Fallback: return string representation
+            return str(result.message)
+        except Exception as e:
+            return f"Error extracting response: {e}\nRaw result: {result.message}"
+    
+    return researcher_tool
 
 
 async def test_researcher_standalone(trader_name: str = "Warren", model_name: str = "gpt-4o-mini"):
