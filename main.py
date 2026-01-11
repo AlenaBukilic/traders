@@ -25,7 +25,6 @@ import sys
 
 load_dotenv(override=True)
 
-# Feature flag (default to Strands)
 USE_LEGACY = os.getenv("USE_LEGACY_AGENTS", "false").strip().lower() == "true"
 
 if USE_LEGACY:
@@ -38,7 +37,6 @@ else:
     from agents.trading_floor import run_every_n_minutes, create_traders
 
 
-# Configuration from environment
 RUN_EVERY_N_MINUTES = int(os.getenv("RUN_EVERY_N_MINUTES", "60"))
 RUN_EVEN_WHEN_MARKET_IS_CLOSED = (
     os.getenv("RUN_EVEN_WHEN_MARKET_IS_CLOSED", "false").strip().lower() == "true"
@@ -66,7 +64,6 @@ if __name__ == "__main__":
     print(f"  - Multi-model mode: {'Enabled' if USE_MANY_MODELS else 'Disabled'}")
     print(f"{'='*60}\n")
     
-    # Check if running in test mode
     if len(sys.argv) > 1 and sys.argv[1] == "once":
         print("Running in single-cycle test mode\n")
         try:
@@ -81,7 +78,6 @@ if __name__ == "__main__":
             traceback.print_exc()
             sys.exit(1)
     else:
-        # Normal mode: run continuously
         print(f"Starting trading floor...\n")
         try:
             asyncio.run(run_every_n_minutes())

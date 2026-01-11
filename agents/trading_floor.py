@@ -22,14 +22,12 @@ import os
 
 load_dotenv(override=True)
 
-# Configuration from environment
 RUN_EVERY_N_MINUTES = int(os.getenv("RUN_EVERY_N_MINUTES", "60"))
 RUN_EVEN_WHEN_MARKET_IS_CLOSED = (
     os.getenv("RUN_EVEN_WHEN_MARKET_IS_CLOSED", "false").strip().lower() == "true"
 )
 USE_MANY_MODELS = os.getenv("USE_MANY_MODELS", "false").strip().lower() == "true"
 
-# Trader configurations
 names = ["Warren", "George", "Ray", "Cathie"]
 lastnames = ["Patience", "Bold", "Systematic", "Crypto"]
 
@@ -82,14 +80,11 @@ async def run_every_n_minutes():
             print(f"Running trading cycle at {asyncio.get_event_loop().time()}")
             print(f"{'='*60}\n")
             
-            # Run all traders concurrently
-            # asyncio.gather runs them in parallel and waits for all to complete
             results = await asyncio.gather(
                 *[trader.run() for trader in traders],
-                return_exceptions=True  # Don't let one trader's error stop others
+                return_exceptions=True
             )
             
-            # Check results
             for trader, result in zip(traders, results):
                 if isinstance(result, Exception):
                     print(f"⚠ {trader.name} encountered error: {result}")
@@ -123,13 +118,11 @@ async def run_once():
         print(f"  - {trader.name} ({trader.lastname}) using {trader.model_name}")
     print()
     
-    # Run all traders concurrently
     results = await asyncio.gather(
         *[trader.run() for trader in traders],
         return_exceptions=True
     )
     
-    # Report results
     print(f"\n{'='*60}")
     print("Results:")
     print(f"{'='*60}")
@@ -148,11 +141,9 @@ async def run_once():
     return success_count == len(traders)
 
 
-# Main entry point
 if __name__ == "__main__":
     import sys
     
-    # Check if running in test mode
     if len(sys.argv) > 1 and sys.argv[1] == "once":
         print("Running in single-cycle test mode")
         try:
@@ -167,7 +158,6 @@ if __name__ == "__main__":
             traceback.print_exc()
             sys.exit(1)
     else:
-        # Normal mode: run continuously
         print(f"Starting trading floor")
         print(f"Running every {RUN_EVERY_N_MINUTES} minutes")
         print(f"Market hours check: {'disabled' if RUN_EVEN_WHEN_MARKET_IS_CLOSED else 'enabled'}")

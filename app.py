@@ -9,7 +9,6 @@ from infrastructure.database import read_log
 
 load_dotenv(override=True)
 
-# Import from correct module based on feature flag
 USE_LEGACY = os.getenv("USE_LEGACY_AGENTS", "false").strip().lower() == "true"
 
 if USE_LEGACY:
@@ -176,7 +175,6 @@ class TraderView:
         )
 
 
-# Main UI construction
 def create_ui():
     """Create the main Gradio UI for the trading simulation"""
 

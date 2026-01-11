@@ -24,7 +24,6 @@ load_dotenv(override=True)
 class ModelProvider:
     """Abstraction layer for model providers supporting both SDKs"""
     
-    # Model provider configuration
     DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
     GROK_BASE_URL = "https://api.x.ai/v1"
     GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
@@ -49,9 +48,7 @@ class ModelProvider:
         """
         from strands.models.openai import OpenAIModel
         
-        # Determine provider based on model name
         if "/" in model_name:
-            # OpenRouter format (e.g., "anthropic/claude-3.5-sonnet")
             api_key = os.getenv("OPENROUTER_API_KEY")
             base_url = ModelProvider.OPENROUTER_BASE_URL
         elif "deepseek" in model_name:
@@ -64,16 +61,13 @@ class ModelProvider:
             api_key = os.getenv("GOOGLE_API_KEY")
             base_url = ModelProvider.GEMINI_BASE_URL
         else:
-            # Default to OpenAI
             api_key = os.getenv("OPENAI_API_KEY")
-            base_url = None  # Use default OpenAI base URL
+            base_url = None
         
-        # Create client args
         client_args = {"api_key": api_key}
         if base_url:
             client_args["base_url"] = base_url
         
-        # Create and return Strands model
         return OpenAIModel(
             model_id=model_name,
             client_args=client_args
@@ -103,7 +97,6 @@ class ModelProvider:
                 "LiteLLM not available. Install with: uv pip install litellm"
             )
         
-        # Determine API key based on model name
         if "/" in model_name:
             api_key = os.getenv("OPENROUTER_API_KEY")
             base_url = ModelProvider.OPENROUTER_BASE_URL
@@ -120,7 +113,6 @@ class ModelProvider:
             api_key = os.getenv("OPENAI_API_KEY")
             base_url = None
         
-        # Create LiteLLM model
         return LiteLLMModel(
             model_id=model_name,
             client_args={
@@ -145,9 +137,7 @@ class ModelProvider:
         from agents import OpenAIChatCompletionsModel
         from openai import AsyncOpenAI
         
-        # Create appropriate client based on model name
         if "/" in model_name:
-            # OpenRouter
             client = AsyncOpenAI(
                 base_url=ModelProvider.OPENROUTER_BASE_URL,
                 api_key=os.getenv("OPENROUTER_API_KEY")
@@ -168,7 +158,6 @@ class ModelProvider:
                 api_key=os.getenv("GOOGLE_API_KEY")
             )
         else:
-            # Return model name for default OpenAI (let agents SDK handle it)
             return model_name
         
         return OpenAIChatCompletionsModel(
@@ -177,7 +166,6 @@ class ModelProvider:
         )
 
 
-# Convenience functions for common use cases
 def create_strands_model(model_name: str, use_litellm: bool = False) -> Any:
     """
     Convenience function to create a Strands model.
@@ -207,7 +195,6 @@ def create_openai_agents_model(model_name: str) -> Any:
     return ModelProvider.get_openai_agents_model(model_name)
 
 
-# Example usage
 if __name__ == "__main__":
     import asyncio
     
@@ -215,7 +202,6 @@ if __name__ == "__main__":
         """Test model provider creation"""
         print("Testing Model Providers\n")
         
-        # Test Strands models
         print("=== Strands Models ===")
         models_to_test = [
             "gpt-4o-mini",
@@ -231,7 +217,6 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"✗ Failed to create {model_name}: {e}")
         
-        # Test OpenAI Agents models
         print("\n=== OpenAI Agents Models ===")
         for model_name in models_to_test:
             try:

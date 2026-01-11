@@ -33,7 +33,6 @@ from infrastructure.database import write_log
 from core.observability import create_log_hook
 
 
-# Max turns for agent execution (from original)
 MAX_TURNS = 30
 
 
@@ -58,7 +57,7 @@ class Trader:
         self.lastname = lastname
         self.model_name = model_name
         self.agent = None
-        self.do_trade = True  # Alternates between trade and rebalance
+        self.do_trade = True
     
     async def create_agent(self, trader_mcp_servers, researcher_tool) -> Agent:
         """
@@ -71,22 +70,18 @@ class Trader:
         Returns:
             Configured Strands Agent instance
         """
-        # Get model from provider
         model = ModelProvider.get_strands_model(self.model_name)
         
-        # Create log hook for observability
         log_hook = create_log_hook(self.name)
         
-        # Combine all tools
         all_tools = [researcher_tool] + (trader_mcp_servers if trader_mcp_servers else [])
         
-        # Create Strands Agent
         self.agent = Agent(
             name=self.name,
             system_prompt=trader_instructions(self.name),
             model=model,
             tools=all_tools,
-            hooks=[log_hook]  # Add logging hook
+            hooks=[log_hook]
         )
         
         return self.agent
@@ -111,24 +106,19 @@ class Trader:
             trader_mcp_servers: MCP servers for trader tools
             researcher_tool: Researcher agent as tool
         """
-        # Create agent
         self.agent = await self.create_agent(trader_mcp_servers, researcher_tool)
         
-        # Get account and strategy
         account = await self.get_account_report()
         strategy = await read_strategy_resource(self.name)
         
-        # Create message based on mode
         message = (
             trade_message(self.name, strategy, account)
             if self.do_trade
             else rebalance_message(self.name, strategy, account)
         )
         
-        # Invoke agent using Strands API
         result = await self.agent.invoke_async(message)
         
-        # Log completion
         mode = "trading" if self.do_trade else "rebalancing"
         write_log(self.name, "agent", f"Completed {mode} - stop reason: {result.stop_reason}")
         
@@ -142,7 +132,6 @@ class Trader:
         - Trader MCP servers (accounts, market, push)
         - Researcher tool (which has its own MCP servers)
         """
-        # Create trader MCP servers
         trader_mcp_tools = []
         for params in trader_mcp_server_params:
             server_params = StdioServerParameters(
@@ -160,14 +149,11 @@ class Trader:
             )
             trader_mcp_tools.append(mcp_client)
         
-        # Create researcher tool
-        # The researcher tool manages its own MCP servers internally
         researcher_tool = await get_researcher_tool(
             self.name,
             self.model_name
         )
         
-        # Run agent with all tools
         await self.run_agent(trader_mcp_tools, researcher_tool)
     
     async def run_with_trace(self):
@@ -203,7 +189,6 @@ class Trader:
         self.do_trade = not self.do_trade
 
 
-# Standalone test function
 async def test_single_trader(
     name: str = "Warren",
     lastname: str = "Patience",
@@ -223,10 +208,8 @@ async def test_single_trader(
     print(f"\n=== Testing Trader: {name} ({lastname}) ===")
     print(f"Model: {model_name}\n")
     
-    # Create trader
     trader = Trader(name, lastname, model_name)
     
-    # Run trader
     print("Running trader... (this may take 2-3 minutes)")
     await trader.run()
     
@@ -234,7 +217,6 @@ async def test_single_trader(
     print(f"  Mode for next run: {'Trade' if trader.do_trade else 'Rebalance'}")
 
 
-# Example usage
 if __name__ == "__main__":
     import sys
     

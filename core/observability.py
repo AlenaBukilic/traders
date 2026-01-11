@@ -144,7 +144,7 @@ def make_trace_id(tag: str) -> str:
     return f"trace_{tag}{random_suffix}"
 
 
-# Example usage
+
 if __name__ == "__main__":
     import asyncio
     from strands import Agent
@@ -154,11 +154,9 @@ if __name__ == "__main__":
         """Test the log hook"""
         print("Testing StrandsLogHook")
         
-        # Create hook
         hook = create_log_hook("TestTrader")
         print(f"✓ Created hook for TestTrader")
         
-        # Create agent with hook
         model = ModelProvider.get_strands_model("gpt-4o-mini")
         agent = Agent(
             name="TestAgent",
@@ -169,14 +167,12 @@ if __name__ == "__main__":
         
         print(f"✓ Created agent with hook")
         
-        # Invoke agent to trigger hooks
         print("\nInvoking agent (will trigger hooks)...")
         result = await agent.invoke_async("Say 'Hook test successful'")
         
         print(f"\n✓ Agent invoked, hooks triggered")
         print(f"  Stop reason: {result.stop_reason}")
         
-        # Check logs
         from infrastructure.database import read_log
         logs = list(read_log("TestTrader", last_n=10))
         

@@ -25,7 +25,6 @@ async def test_quick():
         print(f"  Name: {getattr(researcher_tool, 'name', 'N/A')}")
         print(f"  Description: {getattr(researcher_tool, 'description', 'N/A')[:100]}...")
         
-        # Check it's callable
         if callable(researcher_tool):
             print(f"  ✓ Tool is callable")
         
